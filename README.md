@@ -56,7 +56,7 @@ The tool is distributed as a single assembly. It is not published to the XrmTool
 so installation is a file copy.
 
 1. Close XrmToolBox. It locks plugin assemblies while it is running.
-2. Download `Oliver4.DataModelDesigner.dll` from the latest release.
+2. Download the ZIP from https://www.oliver4-devtools.com/tools/data-model-designer/ and extract Oliver4.DataModelDesigner.dll.
 3. Copy it into your XrmToolBox plugins folder:
 
    ```
