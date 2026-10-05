@@ -1,0 +1,1150 @@
+/* --------------------------------------------------------------------
+   Oliver4 Data Model Designer - canvas chrome
+
+   Two themes. Every colour is a custom property declared twice: once on
+   :root for light, once on body.theme-dark. Nothing below the variable
+   blocks hard-codes a colour, so a new theme is a variable block rather
+   than a sweep through the file.
+
+   The canvas itself is not styled here - it is SVG drawn with
+   presentation attributes so screen and export are the same drawing, and
+   its palette lives in Web/js/theme.js. The two must stay in step.
+   -------------------------------------------------------------------- */
+
+:root {
+  --accent: #1f5fe0;
+  --accent-strong: #1a52c4;
+  --accent-soft: #eaf1ff;
+  --accent-border: #d3e0f8;
+  --on-accent: #ffffff;
+
+  --ink: #101725;
+  --ink-2: #2c3648;
+  --ink-3: #5b6577;
+  /* Same rule the dark block below states for itself: the quiet inks have to clear 4.5:1 on the
+     *lightest* surface they are ever drawn on, and in light that is not white - it is the tinted
+     status fills, which carry --ink-5 text. #656e80 is the lightest value on this ramp clearing
+     4.5:1 on all seven light surfaces - worst is --accent-soft at 4.52, --surface-2 is 4.86,
+     white 5.13. --ink-4 measures 4.93 / 5.20. */
+  --ink-4: #646d80;
+  --ink-5: #656e80;
+
+  --surface: #ffffff;
+  --surface-2: #f7f9fc;
+  --surface-raised: #ffffff;
+  --surface-input: #ffffff;
+  --glass: rgba(255, 255, 255, .92);
+  --glass-strong: rgba(255, 255, 255, .96);
+  --scrim: rgba(16, 23, 37, .38);
+  --veil: rgba(255, 255, 255, .55);
+
+  --line: #e4e9f2;
+  --line-strong: #d5dceb;
+  --grid-dot: #c8d2e4;
+
+  --proposed: #c98a12;
+  /* Drawn at 8.5px in .proposed-row and .proposed-note, both on --proposed-fill, where it
+     measures 4.80 (5.09 on white). */
+  --proposed-ink: #94650d;
+  --proposed-fill: #fff8e6;
+  --proposed-line: #f0dfae;
+
+  --external: #7a4fd1;
+  --external-ink: #7a4fd1;
+  --external-fill: #f6f1ff;
+  --external-line: #ddd0f5;
+
+  --deprecated: #c0392f;
+  --deprecated-ink: #9b2c22;
+  --deprecated-fill: #fdf0ee;
+  --deprecated-line: #f3cdc7;
+
+  --required: #c0392f;
+  --ok: #16a34a;
+  /* The green above is a dot and a border colour. As *text* it measures under 3:1 on white, which
+     is why every other status here has a darkened ink variant beside its mark colour. */
+  --ok-ink: #10763a;
+  --ok-fill: #e9f7ef;
+  --ok-line: #a8dfc0;
+  --connector: #8ea3c4;
+
+  --shadow-sm: 0 1px 2px rgba(16, 23, 37, .06);
+  --shadow-md: 0 6px 16px rgba(16, 23, 37, .10);
+  --shadow-lg: 0 18px 44px rgba(16, 23, 37, .16);
+
+  --radius: 10px;
+  --radius-sm: 6px;
+
+  --font: "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --mono: Consolas, "Cascadia Mono", "SFMono-Regular", ui-monospace, monospace;
+
+  --bar-h: 52px;
+  --gap: 14px;
+
+  /* The right-hand inspector's width. A variable rather than a number in two rules: the legend's
+     default corner steps out of this column while that panel is open, and the two have to be the
+     same measurement or the legend lands half under it. */
+  --inspector-w: 336px;
+
+  /* The brand block never shrinks below this, so the tool name and the diagram
+     name stay readable when the window is narrow. */
+  --brand-w: 216px;
+}
+
+/* Dark theme.
+
+   Raised in contrast throughout, each point handled by a variable here rather than by a rule
+   further down:
+
+   - Grey text on a dark card reads as switched-off rather than secondary, and column names, types
+     and subtitles are the bulk of what is on a card. Every ink is lifted well towards white, and
+     none of them is below the ratio that stays legible at 10px.
+   - The lines are strong, the panel surfaces lighter than the canvas and the glass fills close to
+     opaque, so a floating panel has a visible edge and the two surfaces do not bleed together.
+   - The status tints are strong enough that a proposed and an existing card differ by more than
+     their border. */
+body.theme-dark {
+  --accent: #7ea6ff;
+  --accent-strong: #9dbcff;
+  --accent-soft: #24334f;
+  --accent-border: #41598a;
+  --on-accent: #0b101c;
+
+  --ink: #f0f3f9;
+  --ink-2: #d8e0ec;
+  --ink-3: #b3becf;
+  --ink-4: #94a0b4;
+  /* The quietest ink still has to clear 4.5:1 on the *lightest* surface it is ever drawn on, not
+     just on the canvas. Its worst case is the sticky header of a grid inside a modal - 10px,
+     uppercase, letter-spaced - which is --ink-5 on --surface-2, where #8d98ac measures 4.87. On the
+     canvas itself it is 6.05. */
+  --ink-5: #8d98ac;
+
+  --surface: #141924;
+  --surface-2: #232b3c;
+  --surface-raised: #1e2534;
+  --surface-input: #10151f;
+  --glass: rgba(26, 32, 45, .96);
+  --glass-strong: rgba(30, 37, 52, .985);
+  --scrim: rgba(3, 5, 10, .66);
+  --veil: rgba(10, 13, 20, .72);
+
+  --line: #3a4559;
+  --line-strong: #56647d;
+  --grid-dot: #3f4a63;
+
+  --proposed: #edb54a;
+  --proposed-ink: #f0c165;
+  --proposed-fill: #3a2f16;
+  --proposed-line: #7a6524;
+
+  --external: #b99bf2;
+  --external-ink: #c4aaf5;
+  --external-fill: #2e2542;
+  --external-line: #5c4c80;
+
+  --deprecated: #ef7a6b;
+  --deprecated-ink: #f2917f;
+  --deprecated-fill: #3b2320;
+  --deprecated-line: #7a4740;
+
+  --required: #f4897a;
+  --ok: #4fd07c;
+  --ok-ink: #6fdc95;
+  --ok-fill: #1c3326;
+  --ok-line: #35734b;
+  --connector: #8494b3;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .45);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, .55);
+  --shadow-lg: 0 18px 44px rgba(0, 0, 0, .65);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button { font-family: inherit; font-size: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; font-size: inherit; color: var(--ink); }
+select option { background: var(--surface-raised); color: var(--ink); }
+
+/* ---------------------------------------------------------------- canvas */
+
+.canvas-host { position: absolute; inset: 0; }
+
+.canvas { width: 100%; height: 100%; display: block; cursor: default; }
+.canvas.is-panning { cursor: grabbing; }
+.canvas.is-pan-ready { cursor: grab; }
+.canvas.is-connecting { cursor: crosshair; }
+
+.grid-rect { fill: var(--surface); }
+.grid-rect.with-grid { fill: url(#dot-grid); }
+
+.marquee {
+  fill: rgba(31, 95, 224, .08);
+  stroke: var(--accent);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+/* --------------------------------------------------------- command bar */
+
+.command-bar {
+  position: absolute;
+  top: var(--gap); left: var(--gap); right: var(--gap);
+  height: var(--bar-h);
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 12px;
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  z-index: 40;
+  overflow: hidden;
+}
+
+/* Nothing on the bar shrinks. Overflow is what the responsive pass measures,
+   so groups have to keep their natural width rather than squashing. */
+.command-bar > * { flex: 0 0 auto; }
+.command-bar .bar-spacer { flex: 1 1 auto; min-width: 0; }
+
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  width: var(--brand-w); min-width: var(--brand-w);
+}
+.brand-logo { width: 34px; height: 34px; border-radius: 7px; flex: none; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
+
+.brand-name {
+  font-size: 11.5px; font-weight: 600; letter-spacing: .01em;
+  color: var(--ink-2);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.diagram-title {
+  background: none; border: 0; padding: 0;
+  font-size: 12px; color: var(--ink-4);
+  text-align: left; width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.diagram-title:hover { color: var(--accent); }
+
+.bar-divider { width: 1px; height: 24px; background: var(--line); }
+.bar-actions, .bar-right { display: flex; align-items: center; gap: 4px; }
+
+.bar-btn {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-2);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+.bar-btn:hover { background: var(--surface-2); border-color: var(--line); }
+.bar-btn:active { background: var(--accent-soft); }
+.bar-btn.primary { background: var(--accent); color: var(--on-accent); }
+.bar-btn.primary:hover { background: var(--accent-strong); border-color: transparent; }
+.bar-btn[disabled] { opacity: .4; pointer-events: none; }
+.bar-btn.is-on { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent); }
+
+.icon-btn {
+  border: 1px solid transparent; background: transparent; color: var(--ink-3);
+  width: 26px; height: 26px; border-radius: var(--radius-sm);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 15px; line-height: 1;
+}
+.icon-btn:hover { background: var(--surface-2); border-color: var(--line); }
+.icon-btn.is-on { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent); }
+
+.text-btn {
+  border: 0; background: transparent; color: var(--ink-3);
+  padding: 4px 7px; border-radius: 5px;
+}
+.text-btn:hover { background: var(--surface-2); color: var(--ink); }
+
+.detail-switch { display: flex; align-items: center; gap: 7px; }
+.switch-label { font-size: 11px; color: var(--ink-4); }
+
+.segmented {
+  display: inline-flex; background: var(--surface-2);
+  border: 1px solid var(--line); border-radius: 7px; padding: 2px;
+}
+.seg {
+  border: 0; background: transparent; color: var(--ink-3);
+  padding: 4px 9px; border-radius: 5px; font-size: 12px; white-space: nowrap;
+}
+.seg.is-active { background: var(--surface-raised); color: var(--ink); box-shadow: var(--shadow-sm); font-weight: 600; }
+
+.connection-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 999px; padding: 4px 11px 4px 8px;
+  font-size: 11.5px; color: var(--ink-3); max-width: 240px;
+}
+.connection-chip span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.dot-on { background: var(--ok); }
+.dot-off { background: var(--deprecated); }
+
+/* Progressive collapse. Which elements get shelved is decided in app.js (BAR_ITEMS) and applied
+   with this one class, one button at a time, so the bar fills the width available instead of
+   dropping a whole group and leaving a band of empty space. Anything shelved reappears at the top
+   of the overflow menu, built from the same table, so no command is ever lost. */
+.is-shelved { display: none !important; }
+
+/* Last resort at genuinely small widths: the tool's own name goes and the brand block shrinks to
+   the logo and the diagram name, which is the only thing on the bar that says which file is open. */
+.command-bar.hide-brand-text .brand { width: auto; min-width: 0; max-width: 150px; }
+.command-bar.hide-brand-text .brand-name { display: none; }
+
+/* --------------------------------------------------------------- panels */
+
+.panel {
+  position: absolute;
+  background: var(--glass-strong);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  display: flex; flex-direction: column;
+  z-index: 30;
+  overflow: hidden;
+}
+
+.left-panel {
+  left: var(--gap);
+  top: calc(var(--bar-h) + var(--gap) * 2);
+  bottom: calc(var(--gap) + 44px);
+  width: 288px;
+}
+.left-panel.is-collapsed { width: 34px; }
+.left-panel.is-collapsed > *:not(.panel-collapse) { display: none; }
+
+.inspector {
+  right: var(--gap);
+  top: calc(var(--bar-h) + var(--gap) * 2);
+  width: var(--inspector-w);
+  max-height: calc(100% - var(--bar-h) - var(--gap) * 3 - 44px);
+}
+
+.panel-collapse {
+  position: absolute; right: 4px; top: 8px;
+  width: 24px; height: 24px; border-radius: 5px;
+  border: 0; background: transparent; color: var(--ink-4); font-size: 11px;
+}
+.panel-collapse:hover { background: var(--surface-2); }
+.left-panel.is-collapsed .panel-collapse { right: 5px; transform: rotate(180deg); }
+
+.panel-tabs { display: flex; gap: 2px; padding: 8px 34px 0 8px; border-bottom: 1px solid var(--line); }
+.panel-tab {
+  border: 0; background: transparent; color: var(--ink-4);
+  padding: 6px 9px; border-radius: 6px 6px 0 0; font-size: 12px;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.panel-tab:hover { color: var(--ink-2); }
+.panel-tab.is-active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 8px 9px 12px; border-bottom: 1px solid var(--line);
+  font-size: 12px; font-weight: 600; color: var(--ink-2);
+}
+
+.panel-search { padding: 8px; border-bottom: 1px solid var(--line); position: relative; }
+.panel-search input {
+  width: 100%; border: 1px solid var(--line); border-radius: 7px;
+  padding: 6px 8px 6px 26px; background: var(--surface-2); outline: none;
+  -webkit-user-select: text; user-select: text;
+}
+.panel-search input:focus { border-color: var(--accent-border); background: var(--surface-input); }
+.search-icon { position: absolute; left: 17px; top: 15px; color: var(--ink-5); font-size: 12px; }
+
+.panel-body { overflow: auto; flex: 1 1 auto; padding: 6px 0 10px; }
+
+.group-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px 5px; font-size: 10px; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--ink-5);
+}
+.group-head .text-btn { font-size: 11px; text-transform: none; letter-spacing: 0; }
+
+.row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 12px; cursor: default; font-size: 12.5px; color: var(--ink-2);
+}
+.row:hover { background: var(--surface-2); }
+.row.is-selected { background: var(--accent-soft); }
+.row .row-name { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .row-meta { font-size: 10.5px; color: var(--ink-5); flex: none; }
+.row .row-sub { font-family: var(--mono); font-size: 10px; color: var(--ink-5); }
+
+.status-mark { width: 7px; height: 7px; border-radius: 2px; flex: none; }
+.st-existing { background: var(--accent); }
+
+/* An emphasis colour is a light-theme hex chosen for a card, and it is painted on this mark raw so
+   that the list, the cards and the legend agree. Several of them sit under 3:1 against the dark
+   panel - a 7px square nobody can find is not a colour key - so in dark mode the mark keeps an
+   outline of its own and the colour identifies it rather than having to carry it.
+   No state style to lose here: this element has no hover, focus or active rule anywhere. */
+body.theme-dark .status-mark.is-emphasis { box-shadow: 0 0 0 1px var(--line-strong); }
+.st-proposed { background: var(--proposed); }
+.st-external { background: var(--external); }
+.st-deprecated { background: var(--deprecated); }
+
+.badge {
+  font-family: var(--mono); font-size: 8.5px; letter-spacing: .04em;
+  padding: 1px 4px; border-radius: 3px; flex: none;
+}
+.badge-proposed { background: var(--proposed-fill); color: var(--proposed-ink); border: 1px solid var(--proposed-line); }
+.badge-external { background: var(--external-fill); color: var(--external-ink); border: 1px solid var(--external-line); }
+.badge-deprecated { background: var(--deprecated-fill); color: var(--deprecated-ink); border: 1px solid var(--deprecated-line); }
+.badge-missing { background: var(--deprecated-fill); color: var(--deprecated-ink); border: 1px solid var(--deprecated-line); }
+/* Existing has no badge on the canvas - the plain style already means "this is real" - but the
+   explorer needs one to mark a discovered table that is already on the diagram. */
+.badge-existing { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-border); }
+
+.chk {
+  width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--line-strong);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 10px; color: var(--on-accent); background: var(--surface-input); flex: none;
+}
+.chk.is-on { background: var(--accent); border-color: var(--accent); }
+
+.filter-chips { display: flex; gap: 4px; padding: 6px 12px; flex-wrap: wrap; }
+.chip {
+  border: 1px solid var(--line); background: var(--surface-raised); color: var(--ink-3);
+  border-radius: 999px; padding: 2px 9px; font-size: 11px;
+}
+.chip.is-on { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent); font-weight: 600; }
+
+.empty-note { padding: 18px 14px; color: var(--ink-4); font-size: 12px; line-height: 1.5; }
+
+/* ----------------------------------------------------------- inspector */
+
+.insp-section { padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.insp-section:last-child { border-bottom: 0; }
+.insp-heading { font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-5); margin-bottom: 8px; }
+.insp-headline { font-size: 14px; font-weight: 600; color: var(--ink); }
+.insp-schema { font-family: var(--mono); font-size: 11px; color: var(--ink-4); margin-top: 2px; word-break: break-all; }
+.insp-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 9px; }
+.tag {
+  font-size: 10.5px; padding: 2px 7px; border-radius: 999px;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--ink-3);
+}
+.tag.accent { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent); }
+
+.kv { display: grid; grid-template-columns: 108px 1fr; gap: 5px 10px; font-size: 12px; }
+.kv dt { color: var(--ink-4); }
+.kv dd { margin: 0; color: var(--ink-2); word-break: break-word; }
+.kv dd .mono { font-family: var(--mono); font-size: 11px; color: var(--ink-3); display: block; }
+
+.cascade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.cascade-cell {
+  display: flex; justify-content: space-between; gap: 8px;
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 6px; padding: 5px 8px; font-size: 11.5px;
+}
+.cascade-cell span:first-child { color: var(--ink-4); }
+.cascade-cell span:last-child { font-weight: 600; color: var(--ink-2); }
+.cascade-cell.is-notable { background: var(--proposed-fill); border-color: var(--proposed-line); }
+
+.insp-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.note-box {
+  background: var(--proposed-fill); border: 1px solid var(--proposed-line); border-radius: 7px;
+  padding: 9px 10px; font-size: 12px; line-height: 1.5; color: var(--proposed-ink);
+}
+
+/* A proposed column listed in the inspector, styled to echo the canvas card. */
+.proposed-row {
+  display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--proposed-line); background: var(--proposed-fill);
+  border-left: 3px solid var(--proposed);
+  border-radius: 6px; padding: 6px 8px; margin-bottom: 6px;
+  font-size: 12px; color: var(--ink-2);
+}
+.proposed-row .pr-name { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.proposed-row .pr-type { font-size: 10.5px; color: var(--ink-4); flex: none; }
+
+.field {
+  display: block; margin-bottom: 10px;
+}
+.field > label { display: block; font-size: 11px; color: var(--ink-4); margin-bottom: 4px; }
+.field input[type=text], .field input[type=search], .field select, .field textarea {
+  width: 100%; border: 1px solid var(--line-strong); border-radius: 6px;
+  padding: 6px 8px; background: var(--surface-input); outline: none;
+  -webkit-user-select: text; user-select: text;
+}
+.field textarea { min-height: 70px; resize: vertical; line-height: 1.45; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.req { color: var(--required); margin-left: 3px; font-weight: 600; }
+
+/* An empty mandatory box. Deliberately a border and a tint rather than an error
+   message per field: the dialog says once, at the bottom, what is missing. */
+.needs-value, input.needs-value, .field input.needs-value {
+  border-color: var(--required) !important;
+  background: var(--deprecated-fill);
+}
+
+.form-error {
+  font-size: 11.5px; color: var(--deprecated-ink);
+  display: flex; align-items: center; gap: 6px;
+}
+
+.toggle-list { display: grid; gap: 2px; }
+.toggle {
+  display: flex; align-items: center; gap: 8px; padding: 5px 2px;
+  font-size: 12.5px; color: var(--ink-2); cursor: default;
+}
+.toggle:hover { background: var(--surface-2); }
+
+/* ------------------------------------------------------ canvas furniture */
+
+.zoom-controls {
+  position: absolute; left: var(--gap); bottom: var(--gap);
+  display: flex; align-items: center; gap: 3px;
+  background: var(--glass-strong); backdrop-filter: blur(10px);
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 4px 8px; box-shadow: var(--shadow-md); z-index: 35;
+}
+.zoom-level {
+  border: 1px solid transparent; background: transparent; color: var(--ink-3);
+  min-width: 52px; font-size: 11.5px; border-radius: 999px; padding: 2px 6px;
+}
+.zoom-level:hover { background: var(--surface-2); border-color: var(--line); color: var(--ink); }
+.zoom-level .caret { font-size: 8px; margin-left: 3px; opacity: .7; }
+.v-divider { width: 1px; height: 16px; background: var(--line); margin: 0 3px; }
+
+/* The right/bottom corner is the default only. app.js sets left/top inline once the legend has
+   been dragged, and clears them again when the position is reset - so this rule stays the single
+   definition of where the legend starts out. */
+.legend {
+  position: absolute; right: var(--gap); bottom: var(--gap);
+  background: var(--glass-strong); backdrop-filter: blur(10px);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 9px 12px; box-shadow: var(--shadow-md); font-size: 11.5px;
+  cursor: grab; user-select: none;
+
+  /* Below every panel (30) and the zoom pill (35), above the title block (20). The legend is a key
+     to the drawing, not a control, so a panel wins over a legend dragged under it rather than the
+     legend hiding the thing being read. A legend left under one is reached again with Reset
+     position, in Display settings or on the legend's own right-click menu. */
+  z-index: 25;
+
+  /* On a touch screen the browser would otherwise claim a drag that starts here as a pan and
+     cancel the pointer, which drops the gesture halfway through. */
+  touch-action: none;
+}
+
+/* Dragging: the shadow lifts so it reads as picked up, and the cursor stays closed even when the
+   pointer runs ahead of the repaint and leaves the legend behind.
+
+   The rows carry their own cursor and their own hover decoration, both of which give way while the
+   legend is being moved - a hand cursor on the row being dragged by says the wrong thing, and the
+   pencil the hover adds is a flex item, so it would change the legend's width under the pointer
+   mid-drag. */
+.legend.is-dragging { cursor: grabbing; box-shadow: var(--shadow-lg); }
+.legend.is-dragging .legend-row,
+.legend.is-dragging .legend-named { cursor: grabbing; }
+.legend.is-dragging .legend-named:hover::after { content: none; }
+.legend-title { font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-5); margin-bottom: 6px; }
+.legend-row { display: flex; align-items: center; gap: 7px; padding: 1.5px 0; color: var(--ink-3); }
+
+/* Painted like the card it stands for - status fill inside the status border, dashed where the
+   card is dashed - rather than as a solid block of the border colour. Sizes are set inline by
+   paintLegend from the palette. */
+.swatch { width: 10px; height: 10px; border-radius: 2px; box-sizing: border-box; flex: none; }
+
+/* The default corner is under the inspector, which is painted over the legend - so while the
+   inspector is on screen the legend that has never been dragged steps out of its column. Only that
+   one: a legend the user has placed carries an inline `right: auto`, which this cannot override,
+   and a position the user chose is left where it is.
+
+   Known limit: on a narrow window the stepped-aside legend can reach the title block in the
+   bottom centre, which is drawn beneath it. That is a legend sitting over a line of text rather
+   than a legend nobody can see, and dragging it is the answer either way. */
+body.inspector-open .legend { right: calc(var(--inspector-w) + var(--gap) * 2); }
+
+/* A named emphasis colour. Clicking it renames it. */
+.legend-named { cursor: pointer; }
+.legend-named:hover { color: var(--ink); }
+.legend-named:hover::after { content: "✎"; font-size: 10px; opacity: .6; margin-left: 2px; }
+
+.title-block {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  bottom: var(--gap); text-align: center; z-index: 20; pointer-events: none;
+}
+.tb-title { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.tb-sub { font-size: 11px; color: var(--ink-5); margin-top: 2px; }
+
+/* ------------------------------------------------------------ overlays */
+
+/* Above .modal-root, not below it. Most metadata reads - Add tables, Explore, Cascade impact -
+   start from inside an open dialog, and the overlay saying the tool is busy has to show over it.
+   Below the toasts and the context menu, which have to stay reachable over anything. */
+.progress {
+  position: absolute; inset: 0; z-index: 88;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--veil); backdrop-filter: blur(2px);
+}
+.progress-card {
+  background: var(--surface-raised); border: 1px solid var(--line-strong); border-radius: var(--radius);
+  box-shadow: var(--shadow-lg); padding: 18px 22px; min-width: 300px; max-width: 420px; text-align: center;
+}
+.progress-message { font-size: 12.5px; color: var(--ink-2); margin: 10px 0 12px; }
+.progress-track { height: 4px; background: var(--surface-2); border-radius: 2px; overflow: hidden; }
+.progress-bar { height: 100%; width: 0; background: var(--accent); transition: width .2s ease; }
+
+/* Appears only once the work has been running long enough to be worth stopping - see
+   CANCEL_AFTER_MS in ui.js. Reserving the space for it would leave a gap under every quick
+   operation, so the card grows when the button arrives. */
+.progress-actions { margin-top: 12px; }
+.progress-actions .btn { padding: 5px 16px; font-size: 12px; }
+
+.spinner {
+  width: 24px; height: 24px; margin: 0 auto;
+  border: 2.5px solid var(--accent-soft); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.modal-root {
+  position: absolute; inset: 0; z-index: 80;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--scrim); backdrop-filter: blur(3px);
+  padding: 28px;
+}
+.modal {
+  background: var(--surface-raised); border-radius: 12px; box-shadow: var(--shadow-lg);
+  border: 1px solid var(--line);
+  display: flex; flex-direction: column;
+  max-height: 100%; max-width: 100%; overflow: hidden;
+}
+.modal-head {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 14px 16px; border-bottom: 1px solid var(--line);
+}
+.modal-head .modal-title {
+  font-size: 14px; font-weight: 600; flex: 1 1 auto;
+  display: flex; align-items: baseline; gap: 10px; min-width: 0;
+}
+.modal-head .modal-sub {
+  font-size: 11.5px; color: var(--ink-4); font-weight: 400;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.modal-head .icon-btn { align-self: center; }
+.modal-body { padding: 0; overflow: auto; flex: 1 1 auto; }
+.modal-body.padded { padding: 16px; }
+.modal-foot {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px; border-top: 1px solid var(--line); background: var(--surface-2);
+}
+.modal-foot .spacer { flex: 1 1 auto; }
+
+.btn {
+  border: 1px solid var(--line-strong); background: var(--surface-raised); color: var(--ink-2);
+  padding: 7px 14px; border-radius: 7px;
+}
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover { background: var(--accent-strong); }
+.btn.danger { color: var(--deprecated); border-color: var(--deprecated-line); }
+.btn[disabled] { opacity: .45; pointer-events: none; }
+
+.grid-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.grid-table th {
+  position: sticky; top: 0; background: var(--surface-2); z-index: 1;
+  text-align: left; font-size: 10px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-5); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--line);
+}
+.grid-table td { padding: 6px 10px; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+.grid-table tr:hover td { background: var(--surface-2); }
+.grid-table tr.is-selected td { background: var(--accent-soft); }
+.grid-table .mono { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.grid-table td.tight { width: 1%; white-space: nowrap; }
+
+/* Inline editors inside a grid row. Transparent until touched, so a long list of
+   columns reads as a table rather than a wall of boxes. */
+.cell-input {
+  width: 100%; border: 1px solid transparent; background: transparent;
+  padding: 3px 4px; border-radius: 5px; color: var(--ink-2);
+  -webkit-user-select: text; user-select: text;
+}
+.cell-input:hover { border-color: var(--line); }
+.cell-input:focus { border-color: var(--accent); background: var(--surface-input); outline: none; }
+.cell-input.needs-value { border-color: var(--required); background: var(--deprecated-fill); }
+.cell-input::placeholder { color: var(--ink-5); }
+
+.toast-root {
+  position: absolute; right: var(--gap); top: calc(var(--bar-h) + var(--gap) * 2);
+  display: flex; flex-direction: column; gap: 8px; z-index: 90; pointer-events: none;
+}
+.toast {
+  position: relative;
+  background: var(--surface-raised); border: 1px solid var(--line-strong); border-left: 3px solid var(--accent);
+  border-radius: 8px; box-shadow: var(--shadow-md);
+  padding: 10px 32px 10px 14px; max-width: 380px; font-size: 12.5px; color: var(--ink-2);
+  pointer-events: auto; line-height: 1.45;
+}
+.toast .toast-text { white-space: pre-line; }
+.toast.warning { border-left-color: var(--proposed); }
+.toast.error { border-left-color: var(--deprecated); }
+.toast.success { border-left-color: var(--ok); }
+.toast ul { margin: 6px 0 0; padding-left: 16px; color: var(--ink-3); }
+
+/* A visible close button on a toast, so a sticky error says how to get rid of it. Clicking the
+   message also dismisses it. */
+.toast-close {
+  position: absolute; top: 5px; right: 5px;
+  width: 20px; height: 20px; border-radius: 5px;
+  border: 0; background: transparent; color: var(--ink-4);
+  font-size: 15px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.toast-close:hover { background: var(--surface-2); color: var(--ink); }
+
+/* Height-capped and scrollable. The overflow menu grows with everything the command bar has
+   shelved, so on a short window it could be taller than the screen and the items at the top - the
+   ones just taken off the toolbar - would run off the edge. The cap itself is set in ui.js, from
+   the window height. */
+.context-menu {
+  position: absolute; z-index: 95;
+  background: var(--surface-raised); border: 1px solid var(--line-strong); border-radius: 8px;
+  box-shadow: var(--shadow-lg); padding: 4px; min-width: 190px;
+  overflow-y: auto; overscroll-behavior: contain;
+}
+.context-menu::-webkit-scrollbar { width: 9px; }
+.context-menu::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 5px; }
+.context-menu::-webkit-scrollbar-track { background: transparent; }
+.context-menu button {
+  display: block; width: 100%; text-align: left; border: 0; background: transparent;
+  padding: 6px 10px; border-radius: 5px; font-size: 12.5px; color: var(--ink-2);
+}
+.context-menu button:hover { background: var(--surface-2); }
+.context-menu button.danger { color: var(--deprecated); }
+.context-menu button.is-on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.context-menu .sep { height: 1px; background: var(--line); margin: 4px 2px; }
+.context-menu .menu-label {
+  padding: 6px 10px 3px; font-size: 10px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-5);
+}
+
+.swatch-row { display: flex; gap: 6px; padding: 6px 0; flex-wrap: wrap; }
+
+/* An emphasis swatch is painted the way the card will be: the tinted body colour
+   with the saturated hue as its border. What you pick is what you get. */
+.swatch-btn {
+  width: 24px; height: 20px; border-radius: 5px;
+  border: 1.5px solid var(--line-strong); background: var(--surface-raised);
+  padding: 0; position: relative;
+}
+.swatch-btn.is-picked { outline: 2px solid var(--ink); outline-offset: 1px; }
+.swatch-btn.none::after {
+  content: ""; position: absolute; inset: 3px;
+  background: linear-gradient(to bottom right, transparent 45%, var(--deprecated) 45%, var(--deprecated) 55%, transparent 55%);
+}
+
+/* --------------------------------------------------------------- welcome */
+
+.welcome {
+  position: absolute; inset: 0; z-index: 60;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--veil); backdrop-filter: blur(4px);
+}
+.welcome-card {
+  background: var(--surface-raised); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: var(--shadow-lg); width: 560px; max-width: 100%; overflow: hidden;
+}
+.welcome-head { display: flex; align-items: center; gap: 12px; padding: 20px 22px 14px; }
+.welcome-head img { width: 38px; height: 38px; border-radius: 8px; }
+.welcome-head h1 { margin: 0; font-size: 16px; }
+.welcome-head p { margin: 2px 0 0; font-size: 12px; color: var(--ink-4); }
+.start-option {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  text-align: left; border: 0; border-top: 1px solid var(--line);
+  background: transparent; padding: 13px 22px;
+}
+.start-option:hover { background: var(--surface-2); }
+.start-option .so-title { font-size: 13px; font-weight: 600; color: var(--ink); }
+.start-option .so-sub { font-size: 11.5px; color: var(--ink-4); margin-top: 1px; }
+.start-option .so-mark {
+  width: 30px; height: 30px; border-radius: 8px; flex: none;
+  background: var(--accent-soft); color: var(--accent);
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.start-option[disabled] { opacity: .45; pointer-events: none; }
+
+.welcome-foot {
+  border-top: 1px solid var(--line); background: var(--surface-2);
+  padding: 11px 22px; font-size: 11.5px; color: var(--ink-4);
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+
+/* ------------------------------------------------- dark-theme contrast ---
+
+   The floating furniture - panels, the command bar, the zoom pill, the legend - sits directly on
+   the canvas with nothing behind it. On a light background a hairline border is enough to separate
+   the two; on dark it is not, and a panel with no visible edge reads as part of the drawing. These
+   rules only apply in dark mode, so the light theme keeps the lighter touch that suits it. */
+
+body.theme-dark .panel,
+body.theme-dark .command-bar,
+body.theme-dark .zoom-controls,
+body.theme-dark .legend,
+body.theme-dark .modal,
+body.theme-dark .welcome-card {
+  border-color: var(--line-strong);
+}
+
+/* A second, darker ring outside the border. It reads as a shadow rather than as a second line,
+   and it is what actually lifts a panel off a canvas of a similar value. */
+body.theme-dark .panel,
+body.theme-dark .command-bar,
+body.theme-dark .zoom-controls,
+body.theme-dark .legend {
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(0, 0, 0, .45);
+}
+
+/* The exception the block below describes, because the legend has a drag state. This rule is two
+   classes and a tag, so it out-specifies the blanket one above; without it the lifted shadow that
+   says "picked up" would be lost in dark mode only. */
+body.theme-dark .legend.is-dragging {
+  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0, 0, 0, .45);
+}
+
+/* Inputs, buttons, pickable cards and the section rules inside a panel are NOT listed here. Every
+   one of them already draws its border from --line or --line-strong, both of which are a step
+   stronger in the variable block above, so they are covered - and adding
+   `body.theme-dark .field input { border-color: ... }` would out-specify `.field input:focus`,
+   `.btn.danger` and `.start-card:hover`, which are single-class rules. The focus ring, the danger
+   outline and the card hover would then be dead in dark mode only. State styles win by being
+   specific; a blanket theme rule takes that away.
+
+   The rules above are safe because a panel, the command bar and the zoom pill have no hover or
+   focus state to lose. The legend has one - it can be dragged - which is why the .is-dragging rule
+   above exists rather than being left to the blanket rule to swallow. */
+
+/* The active pill in a segmented control. In dark mode the raised surface is darker than the inset
+   one - correct for hover states everywhere else, wrong here, where the pill is meant to sit on
+   top of the track rather than be cut into it. Background only: adding a border would change the
+   button's size and shift its neighbours as the selection moves. */
+body.theme-dark .segmented { background: var(--surface-input); }
+body.theme-dark .seg.is-active { background: var(--surface-2); }
+
+/* ------------------------------------------------------------- utilities */
+
+[hidden] { display: none !important; }
+.mono { font-family: var(--mono); }
+.muted { color: var(--ink-4); }
+.small { font-size: 11.5px; }
+.nowrap { white-space: nowrap; }
+.scroll-y { overflow-y: auto; }
+.selectable { -webkit-user-select: text; user-select: text; }
+.warn-list { margin: 8px 0 0; padding-left: 18px; font-size: 12px; color: var(--ink-3); line-height: 1.5; }
+
+/* ------------------------------------------------------------ wizard ---
+   The new-diagram dialog. One question per step, so the panel is a simple
+   vertical stack: progress, lead-in, controls, then the list that grows.
+   The step name lives in the progress bar and nowhere else. */
+
+.wizard {
+  display: flex; flex-direction: column;
+  height: 100%; min-height: 0;
+}
+
+.wizard-steps {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 10px 18px; border-bottom: 1px solid var(--line); background: var(--surface-2);
+  flex: none;
+}
+.wizard-step {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11.5px; color: var(--ink-5);
+  padding: 3px 10px 3px 4px; border-radius: 999px; border: 1px solid transparent;
+}
+.wizard-step + .wizard-step::before {
+  content: ''; width: 14px; height: 1px; background: var(--line-strong); margin-right: 2px;
+}
+.wizard-step-number {
+  width: 18px; height: 18px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 600;
+  background: var(--surface-raised); border: 1px solid var(--line-strong); color: var(--ink-5);
+}
+.wizard-step.is-done { color: var(--ink-3); }
+.wizard-step.is-done .wizard-step-number { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent); }
+.wizard-step.is-current { color: var(--ink); font-weight: 600; background: var(--surface-raised); border-color: var(--line); }
+.wizard-step.is-current .wizard-step-number { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+
+.wizard-panel {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 16px 18px; flex: 1 1 auto; min-height: 0; overflow: auto;
+}
+
+.wizard-lead { flex: none; }
+.wizard-lead h2 { margin: 0; font-size: 15px; font-weight: 600; color: var(--ink); }
+.wizard-lead p { margin: 4px 0 0; font-size: 12px; color: var(--ink-4); line-height: 1.5; }
+
+.wizard-search {
+  width: 100%; padding: 7px 10px; border: 1px solid var(--line-strong); border-radius: 7px;
+  background: var(--surface-input); flex: none;
+  -webkit-user-select: text; user-select: text;
+}
+
+.wizard-controls { display: flex; align-items: center; gap: 8px; flex: none; flex-wrap: wrap; }
+.wizard-actions { display: flex; align-items: center; gap: 10px; flex: none; }
+
+.wizard-list {
+  border: 1px solid var(--line); border-radius: 8px; overflow: auto;
+  max-height: 340px;
+}
+.wizard-list.grow { flex: 1 1 auto; min-height: 140px; max-height: none; }
+
+.wizard-warning {
+  border: 1px solid var(--proposed-line); background: var(--proposed-fill); color: var(--proposed-ink);
+  border-radius: 8px; padding: 10px 12px; font-size: 12px; line-height: 1.5; flex: none;
+}
+
+.wizard-recent { border-top: 1px solid var(--line); padding-top: 10px; flex: none; }
+
+.start-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;
+  flex: none;
+}
+.start-card {
+  text-align: left; border: 1px solid var(--line-strong); border-radius: 10px;
+  background: var(--surface-raised); padding: 14px 16px; display: block; cursor: pointer;
+  transition: border-color .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.start-card:hover { border-color: var(--accent-border); background: var(--accent-soft); box-shadow: var(--shadow-sm); }
+.start-card-title { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.start-card-sub { font-size: 12px; color: var(--ink-3); margin-top: 4px; line-height: 1.45; }
+.start-card-why { font-size: 11.5px; color: var(--ink-5); margin-top: 8px; line-height: 1.4; }
+.start-card[disabled] { opacity: .45; pointer-events: none; }
+
+/* ------------------------------------------------------- proposed editor */
+
+.proposed-card {
+  border: 1px solid var(--proposed-line); border-radius: 8px; padding: 10px 12px;
+  margin-bottom: 8px; background: var(--proposed-fill);
+}
+
+/* ------------------------------- description, guide and indicators ---- */
+
+/* Diagram description, on the canvas title block. It sits between the title and the source line,
+   and wraps rather than growing the block sideways across the drawing. */
+.tb-desc {
+  font-size: 11.5px; color: var(--ink-3); margin-top: 3px;
+  max-width: 340px; line-height: 1.45;
+}
+
+/* A pickable card: a bold line saying what it is, and a quieter one saying when to use it. Used
+   by the Propose hub and the layout menu. */
+.choice-card {
+  display: block; width: 100%; text-align: left;
+  border: 1px solid var(--line); border-radius: 9px;
+  background: var(--surface-raised); color: var(--ink-2);
+  padding: 11px 13px; margin-bottom: 8px; cursor: pointer;
+}
+.choice-card:hover:not(:disabled) { border-color: var(--accent-border); background: var(--accent-soft); }
+.choice-card:disabled, .choice-card.is-disabled { opacity: .5; cursor: default; }
+.choice-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.choice-detail { font-size: 11.5px; color: var(--ink-4); line-height: 1.45; }
+
+/* Feature guide and About box. The heading says which tool and which build, because the guide
+   describes behaviour that changes between releases.
+
+   The logo is drawn from the 256px artwork at 88px. The lockup carries the OLIVER 4 wordmark, and
+   a wordmark drawn at or near the artwork's own pixel size looks soft on a high-DPI display. No
+   border radius: the artwork is a transparent shape rather than a tile, so rounding its corners
+   rounds nothing. */
+.guide-head {
+  display: flex; align-items: center; gap: 18px;
+  padding-bottom: 16px; margin-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+.guide-logo { width: 88px; height: 88px; flex: none; }
+.guide-name { font-size: 16px; font-weight: 600; color: var(--ink); }
+/* "for Dataverse" after the product name: what the tool works against, not part of its name. */
+.guide-qualifier { font-weight: 400; color: var(--ink-4); }
+
+/* The brand above the product name. Small, letter-spaced and quiet: it says whose tool this is,
+   the line under it says which tool. */
+.brand-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: .18em;
+  color: var(--ink-5); margin-bottom: 3px;
+}
+
+.feature-line { display: flex; gap: 10px; margin-bottom: 9px; align-items: baseline; }
+.feature-name {
+  flex: 0 0 128px; font-size: 12px; font-weight: 600; color: var(--ink-2);
+}
+.feature-detail { flex: 1 1 auto; font-size: 12px; color: var(--ink-3); line-height: 1.5; }
+
+/* A standing message inside a dialog body - a truncated result, a filter that hid something.
+   Louder than .small.muted, quieter than .form-error. */
+.notice {
+  border: 1px solid var(--proposed-line); background: var(--proposed-fill);
+  color: var(--proposed-ink); border-radius: 7px;
+  padding: 8px 11px; font-size: 11.5px; line-height: 1.5;
+}
+
+/* A labelled control on a panel filter bar. */
+.filter-row { display: flex; align-items: center; gap: 8px; padding: 8px 12px 2px; }
+.panel-select {
+  flex: 1 1 auto; min-width: 0;
+  font-size: 11.5px; padding: 3px 6px;
+  border: 1px solid var(--line); border-radius: 6px;
+  background: var(--surface-input); color: var(--ink-2);
+}
+
+/* Connectivity indicators in the model list. */
+.tag-hub {
+  font-size: 8.5px; letter-spacing: .06em; padding: 1px 5px;
+  background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent);
+}
+.row-meta.is-orphan { color: var(--ink-5); font-style: italic; }
+
+/* Column rows in the table inspector, where each row carries a deprecate toggle. */
+.column-row { padding: 1px 0; }
+.column-row .icon-btn { flex: 0 0 auto; opacity: .45; }
+.column-row:hover .icon-btn { opacity: 1; }
+.column-row.is-deprecated .icon-btn.is-on { opacity: 1; }
+.column-row.is-deprecated { color: var(--deprecated-ink); }
+
+/* Connect mode: a visible sign that the next click means something different from usual. */
+.connect-banner {
+  position: fixed; left: 50%; top: 62px; transform: translateX(-50%); z-index: 80;
+  /* --on-accent, not #fff: white measures 2.39:1 in dark, where --accent is a pale blue. The
+     variable gives 5.57 in light and 7.95 in dark, and keeps this file free of hard-coded colours
+     below the variable blocks. */
+  background: var(--accent); color: var(--on-accent);
+  padding: 7px 14px; border-radius: 999px;
+  font-size: 12px; box-shadow: var(--shadow-md);
+  pointer-events: none;
+}
+.canvas.is-connecting { cursor: crosshair; }
+
+/* ------------------------------------ ownership and cascade impact ---- */
+
+/* Ownership pill, matching the outlined marker the canvas draws on a card header. Neutral on
+   purpose: status colour is already doing work on the same card. */
+.ownership-pill {
+  display: inline-block; min-width: 26px; text-align: center;
+  border: 1px solid var(--line-strong); border-radius: 7px;
+  padding: 0 4px; margin-right: 7px;
+  font-size: 7.5px; font-weight: 600; letter-spacing: .04em;
+  color: var(--ink-4);
+}
+.legend-ownership { margin-top: 4px; }
+
+/* Cascade impact dialog. Three kinds of answer, told apart by a left rule rather than a fill,
+   so a long chain does not become three blocks of colour. */
+.cascade-headline { padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.cascade-verdict { font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.45; margin-bottom: 3px; }
+
+.cascade-group { margin-top: 16px; padding-left: 11px; border-left: 3px solid var(--line-strong); }
+.cascade-group.is-affected { border-left-color: var(--deprecated); }
+.cascade-group.is-blocker { border-left-color: var(--proposed); }
+.cascade-group.is-detached { border-left-color: var(--line-strong); }
+.cascade-group .row { padding-left: 0; padding-right: 0; }
+
+/* --------------------------------- draw tools, badges and explorer ---- */
+
+/* The Draw group on the command bar. A label rather than another divider on its own, because the
+   buttons that put something on the canvas are a different kind of thing from the ones that read
+   the model, and without the label they read as more model commands. Auto-layout is in the group:
+   it draws nothing, but it is the one model command that changes only where things sit on the
+   page, and it belongs with the draw tools. */
+.draw-label {
+  font-size: 11px; color: var(--ink-4); letter-spacing: .04em;
+  padding: 0 2px 0 4px; white-space: nowrap;
+}
+.bar-btn.draw-btn { padding-left: 8px; padding-right: 8px; }
+
+/* Grid and theme, labelled as well as glyphed: the label is what makes them findable, and the
+   glyph is what makes them quick to find again. */
+.bar-btn.toggle-btn { display: inline-flex; align-items: center; gap: 6px; }
+.btn-glyph { font-size: 14px; line-height: 1; opacity: .85; }
+.btn-label { white-space: nowrap; }
+
+/* A draw tool is armed and the next click places something. */
+.canvas.is-drawing { cursor: crosshair; }
+
+/* A result whose tables are all on the diagram, so clicking it does something. Built like every
+   other badge - a pale fill, a darkened ink and a matching line - rather than out of the mark
+   colour, which is a dot colour and does not carry 8.5px text on white. */
+.badge-oncanvas { background: var(--ok-fill); color: var(--ok-ink); border: 1px solid var(--ok-line); }
+.row.is-drawable .row-name { font-weight: 600; color: var(--ink); }
+.path-hint { color: var(--ok-ink); }
+
+/* A disabled item in the context menu. .context-menu button sets its own colour, so without this
+   a disabled item would be drawn in full strength and still highlight on hover. */
+.context-menu button[disabled] { opacity: .4; pointer-events: none; }
+
+/* The explorer's settings screen, which gets the whole dialog. */
+.explore-columns {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px 28px; align-items: start;
+}
+
+/* ------------------------------ wizard lockup and explorer results ---- */
+
+/* The product lockup at the top of the New diagram wizard. It is the same .guide-head the About
+   box and the feature guide build, from the same artwork, sized down here rather than given a
+   class of its own.
+
+   Sized down because the two dialogs are not the same shape: the About box grows to fit whatever
+   is in it, while this one is a fixed 620px tall whatever step it is on, so an 88px lockup would
+   come straight off the height of the table list underneath. At 38px the wordmark is still legible
+   and the strip costs about a row and a half.
+
+   Sitting on --surface-2 with no rule under it, the lockup and the progress bar below it read as
+   one header block closed by a single line, rather than as two stacked bars. */
+.wizard > .guide-head {
+  flex: none;
+  gap: 12px;
+  padding: 11px 18px 10px;
+  margin-bottom: 0;
+  border-bottom: 0;
+  background: var(--surface-2);
+}
+.wizard > .guide-head .guide-logo { width: 38px; height: 38px; }
+.wizard > .guide-head .guide-name { font-size: 13.5px; }
+
+/* The explorer's results head, in two rows. The way back to the settings has a row of its own
+   rather than sharing one with the filter box, which is flex: 1 1 auto and would squeeze the
+   button to the width of its own label. */
+.results-nav { display: flex; align-items: center; }
+.results-tools { display: flex; align-items: center; gap: 10px; }
+
+/* And it is drawn as a control rather than as a link: a bare .text-btn in a header row reads as a
+   caption of the screen it is on, while the border, the fill and the larger hit area say it can be
+   pressed. Declared after .text-btn so the base and the hover both win on source order at equal
+   specificity - and with no theme-scoped override, because one would out-specify this hover in
+   dark mode and kill it there only. */
+.back-btn {
+  padding: 6px 12px 6px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.back-btn:hover {
+  background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent);
+}

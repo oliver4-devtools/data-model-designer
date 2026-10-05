@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Package for the XrmToolBox Tool Library.
+
+  Three rules the Tool Library enforces, and how this file meets them:
+
+  1. The package version must match the tool assembly version, or the tool shows as
+     permanently out of date. Both are set from <Version> in the csproj; keep them in step.
+  2. The dependency must be on "XrmToolBox" itself at the minimum version you target, never on
+     XrmToolBoxPackage.
+  3. Every file must sit under a "Plugins" folder, and the package must contain only assemblies
+     XrmToolBox does not already ship. This tool references the Dataverse SDK, WebView2 and
+     Newtonsoft.Json, all of which come with XrmToolBox, so only our own assembly is packed.
+
+  Build:
+     dotnet build src\Oliver4.DataModelDesigner -c Release
+     nuget pack package\Oliver4.DataModelDesigner.nuspec -Version 1.11.5
+-->
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Oliver4.DataModelDesigner</id>
+    <version>1.11.5</version>
+    <title>Oliver4 Data Model Designer</title>
+    <authors>Oliver4</authors>
+    <owners>Oliver4</owners>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/oliver4-devtools/data-model-designer</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/oliver4-devtools/data-model-designer/main/docs/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Explore, design and document a Dataverse data model from inside XrmToolBox.</summary>
+    <description>
+      A data-model exploration and design tool, not just an ERD exporter.
+
+      Build a focused diagram from a solution or a set of tables, guided step by step.
+      Inspect a relationship's schema name, lookup column and full cascade configuration without
+      leaving the canvas. Switch between tables-only, relationship-column and all-column detail.
+      Add proposed, external and deprecated objects alongside the current model, visibly
+      distinguished without relying on colour alone. Save an editable diagram, reopen it later and
+      refresh it against Dataverse with a difference review.
+
+      Exports to PNG, SVG, draw.io and Mermaid, and experimentally to Visio.
+
+      The tool only ever reads metadata. Nothing it does changes the connected environment.
+    </description>
+    <copyright>© 2026 Oliver4</copyright>
+    <tags>XrmToolBox Dataverse Dynamics365 PowerPlatform ERD DataModel Diagram Architecture Documentation</tags>
+    <dependencies>
+      <dependency id="XrmToolBox" version="1.2025.10.74" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\src\Oliver4.DataModelDesigner\bin\Release\Oliver4.DataModelDesigner.dll"
+          target="lib\net48\Plugins" />
+  </files>
+</package>

@@ -1,0 +1,42 @@
+<!--
+  Compile-verification harness.
+
+  This project is NOT part of the shipped tool. It compiles the real source files against local
+  stub types so the whole C# codebase can be type-checked on a machine that has no access to the
+  XrmToolBox, Dataverse SDK, WebView2 or Newtonsoft.Json packages. A clean build here proves the
+  code is internally consistent; it does not substitute for building the real project in Visual
+  Studio against the real packages.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <LangVersion>7.3</LangVersion>
+    <RootNamespace>Oliver4.DataModelDesigner</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <NoWarn>$(NoWarn);CS0067;CS0169;CS0649;CS1998;CS0108;CS0114;CS0436</NoWarn>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <!-- Targets net8.0 but must run on whatever runtime the machine has. Without this, a Mac
+         with only the current .NET SDK installed fails with "framework 'Microsoft.NETCore.App',
+         version '8.0.0' was not found" - the default roll-forward policy does not cross a major
+         version. -->
+    <RollForward>Major</RollForward>
+    <StartupObject>Oliver4.DataModelDesigner.Verification.ExportChecks</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Stubs/*.cs" />
+    <Compile Include="Tests/*.cs" />
+    <Compile Include="../src/Oliver4.DataModelDesigner/*.cs" />
+    <Compile Include="../src/Oliver4.DataModelDesigner/Bridge/*.cs" />
+    <Compile Include="../src/Oliver4.DataModelDesigner/Export/*.cs" />
+    <Compile Include="../src/Oliver4.DataModelDesigner/Metadata/*.cs" />
+    <Compile Include="../src/Oliver4.DataModelDesigner/Model/*.cs" />
+    <Compile Include="../src/Oliver4.DataModelDesigner/Services/*.cs" />
+    <Compile Include="../src/Oliver4.DataModelDesigner/Properties/*.cs" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>Oliver4 Data Model Designer</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<div id="canvas-host" class="canvas-host">
+  <svg id="canvas" class="canvas" xmlns="http://www.w3.org/2000/svg">
+    <defs id="canvas-defs"></defs>
+    <rect id="grid-rect" class="grid-rect" x="0" y="0" width="100%" height="100%"></rect>
+    <g id="viewport">
+      <!-- Annotations sit in two layers, one either side of everything the model draws, and each
+           annotation says which one it belongs in. Painting order is also hit-test order - the
+           topmost painted element gets the pointer - so a note sent behind a card cannot be picked
+           up through it, which is the whole point of sending it there.
+
+           The behind layer is below the connectors as well as below the cards, so "behind" hides a
+           note under the relationship lines too - the same order both picture exporters use. -->
+      <g id="layer-annotations"></g>
+      <g id="layer-links"></g>
+      <g id="layer-tables"></g>
+      <g id="layer-annotations-front"></g>
+      <g id="layer-overlay"></g>
+    </g>
+    <rect id="marquee" class="marquee" style="display:none"></rect>
+  </svg>
+</div>
+
+<!-- ------------------------------------------------------------------ -->
+<!-- Command bar                                                         -->
+<!-- ------------------------------------------------------------------ -->
+<header id="command-bar" class="command-bar" role="toolbar" aria-label="Diagram commands">
+  <div class="brand">
+    <img id="brand-logo" class="brand-logo" alt="" src="img/logo.png">
+    <div class="brand-text">
+      <span class="brand-name">Oliver4 Data Model Designer</span>
+      <button id="diagram-title" class="diagram-title" type="button" title="Rename this diagram">Untitled diagram</button>
+    </div>
+  </div>
+
+  <div class="bar-divider"></div>
+
+  <!-- No nested <div> in here. The verification suite reads this block out of the HTML to check
+       every command on it has an entry in BAR_ITEMS, and it stops at the first closing div. -->
+  <div class="bar-actions">
+    <button class="bar-btn" data-command="add-tables">Add existing tables</button>
+    <button class="bar-btn" data-command="explore">Explore relationships</button>
+    <button class="bar-btn" data-command="propose">Propose new tables</button>
+    <button class="bar-btn" data-command="find-path">Find path</button>
+    <button class="bar-btn" data-command="cascade">Cascade</button>
+
+    <span class="bar-divider draw-divider"></span>
+    <span class="draw-label">Draw</span>
+    <button class="bar-btn draw-btn" data-command="add-sticky"
+            title="Place a sticky note on the canvas">Sticky note</button>
+    <button class="bar-btn draw-btn" data-command="add-text"
+            title="Place a plain text box on the canvas - no background, no border">Text box</button>
+    <button class="bar-btn draw-btn" data-command="add-arrow"
+            title="Drag on the canvas to draw an arrow">Arrow</button>
+    <!-- Auto-layout sits at the end of the Draw group: it is the one model command that changes
+         nothing but where things are drawn. It is shelved before the three draw tools so the group
+         empties from the right rather than developing a hole in the middle. -->
+    <button class="bar-btn draw-btn" data-command="auto-layout"
+            title="Arrange the cards automatically">Auto-layout</button>
+  </div>
+
+  <div class="bar-divider detail-divider"></div>
+
+  <div class="detail-switch">
+    <span class="switch-label">Detail</span>
+    <div class="segmented" role="group" aria-label="Field detail">
+      <button class="seg" data-detail="TablesOnly">Tables</button>
+      <button class="seg" data-detail="RelationshipFields">Rel. fields</button>
+      <button class="seg" data-detail="AllFields">All fields</button>
+    </div>
+  </div>
+
+  <div class="bar-spacer"></div>
+
+  <div class="bar-right">
+    <button id="connection-chip" class="connection-chip" type="button" title="Connected environment">
+      <span class="dot dot-off"></span>
+      <span id="connection-name">Not connected</span>
+    </button>
+    <!-- Labelled rather than glyph-only: a circle and a crescent moon on a toolbar are a guess, not
+         a control. The label is the affordance. -->
+    <button id="grid-toggle" class="bar-btn toggle-btn" data-command="toggle-grid" title="Show the canvas grid">
+      <span class="btn-glyph" aria-hidden="true">&#9638;</span><span class="btn-label">Grid</span>
+    </button>
+    <button id="theme-toggle" class="bar-btn toggle-btn" data-command="toggle-theme" title="Switch to dark mode">
+      <span class="btn-glyph" aria-hidden="true">&#9789;</span><span id="theme-label" class="btn-label">Dark mode</span>
+    </button>
+    <button class="bar-btn" data-command="display-settings">Display settings</button>
+    <button class="bar-btn" data-command="refresh">Refresh</button>
+    <button class="bar-btn primary" data-command="save">Save</button>
+    <button class="bar-btn icon-btn" data-command="menu" title="More">&#8943;</button>
+  </div>
+</header>
+
+<!-- ------------------------------------------------------------------ -->
+<!-- Left panel                                                          -->
+<!-- ------------------------------------------------------------------ -->
+<aside id="left-panel" class="panel left-panel" aria-label="Model contents">
+  <div class="panel-tabs" role="tablist">
+    <button class="panel-tab is-active" data-tab="model" role="tab">Model</button>
+    <button class="panel-tab" data-tab="relationships" role="tab">Relationships</button>
+    <button class="panel-tab" data-tab="notes" role="tab">Notes</button>
+  </div>
+
+  <div class="panel-search">
+    <span class="search-icon" aria-hidden="true">&#9906;</span>
+    <input id="panel-search" type="search" placeholder="Search tables and columns..." autocomplete="off">
+  </div>
+
+  <div id="tab-model" class="panel-body" role="tabpanel"></div>
+  <div id="tab-relationships" class="panel-body" role="tabpanel" hidden></div>
+  <div id="tab-notes" class="panel-body" role="tabpanel" hidden></div>
+
+  <button id="left-panel-toggle" class="panel-collapse" type="button" title="Hide panel">&#10094;</button>
+</aside>
+
+<!-- ------------------------------------------------------------------ -->
+<!-- Inspector                                                           -->
+<!-- ------------------------------------------------------------------ -->
+<aside id="inspector" class="panel inspector" aria-label="Inspector" hidden>
+  <div class="panel-head">
+    <span id="inspector-title">Inspector</span>
+    <button id="inspector-close" class="icon-btn" type="button" title="Close">&#215;</button>
+  </div>
+  <div id="inspector-body" class="panel-body"></div>
+</aside>
+
+<!-- ------------------------------------------------------------------ -->
+<!-- Canvas furniture                                                    -->
+<!-- ------------------------------------------------------------------ -->
+<div id="zoom-controls" class="zoom-controls">
+  <button class="icon-btn" data-command="zoom-out" title="Zoom out">&#8722;</button>
+  <button id="zoom-level" class="zoom-level" type="button" title="Choose a zoom level">100%</button>
+  <button class="icon-btn" data-command="zoom-in" title="Zoom in">+</button>
+  <span class="v-divider"></span>
+  <button class="text-btn" data-command="fit" title="Fit to view">Fit</button>
+  <button class="text-btn" data-command="undo" title="Undo (Ctrl+Z)">Undo</button>
+  <button class="text-btn" data-command="redo" title="Redo (Ctrl+Y)">Redo</button>
+</div>
+
+<!-- Rows are built by paintLegend() in app.js from the live palette, so a swatch is painted the
+     way the card is drawn rather than approximating it with a solid block. -->
+<div id="legend" class="legend">
+  <div class="legend-title">Legend</div>
+  <div id="legend-rows"></div>
+</div>
+
+<div id="title-block" class="title-block">
+  <div id="title-block-title" class="tb-title">Untitled diagram</div>
+  <div id="title-block-desc" class="tb-desc" hidden></div>
+  <div id="title-block-sub" class="tb-sub"></div>
+</div>
+
+<!-- ------------------------------------------------------------------ -->
+<!-- Overlays                                                            -->
+<!-- ------------------------------------------------------------------ -->
+<!-- Above the modal layer, so a metadata read started from inside a dialog shows its progress
+     over that dialog rather than behind it. -->
+<div id="progress" class="progress" hidden>
+  <div class="progress-card">
+    <div class="spinner" aria-hidden="true"></div>
+    <div id="progress-message" class="progress-message">Working...</div>
+    <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
+    <div id="progress-actions" class="progress-actions" hidden>
+      <button id="progress-cancel" class="btn" type="button" hidden>Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-root" class="modal-root" hidden></div>
+<div id="toast-root" class="toast-root" aria-live="polite"></div>
+<div id="context-menu" class="context-menu" hidden></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

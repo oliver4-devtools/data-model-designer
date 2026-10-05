@@ -1,0 +1,93 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputType>Library</OutputType>
+    <LangVersion>7.3</LangVersion>
+    <RootNamespace>Oliver4.DataModelDesigner</RootNamespace>
+    <AssemblyName>Oliver4.DataModelDesigner</AssemblyName>
+
+    <!-- The package version and the assembly version must match or the Tool Library
+         shows the tool as permanently out of date.
+
+         FileVersion is three-part while AssemblyVersion stays four.
+
+         XrmToolBox reads FileVersionInfo.FileVersion off the tool assembly for the version it
+         prints beside the tool in its list, and that property is the *string* in the Win32 version
+         resource, which the compiler writes verbatim from AssemblyFileVersionAttribute. Four
+         numbers there would show in the list as, for example, "1.5.0.0" rather than 1.5.0.
+
+         AssemblyVersion stays four-part: it is the identity the CLR binds against
+         rather than something anyone reads, and it is always padded to four numbers whatever is
+         written here, so shortening it would change nothing on screen. -->
+    <Version>1.11.5</Version>
+    <AssemblyVersion>1.11.5.0</AssemblyVersion>
+    <FileVersion>1.11.5</FileVersion>
+
+    <Company>Oliver4</Company>
+    <Authors>Oliver4</Authors>
+    <Product>Oliver4 Data Model Designer</Product>
+    <Description>Explore, design and document a Dataverse data model from inside XrmToolBox.</Description>
+    <Copyright>© 2026 Oliver4</Copyright>
+
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <!-- Release builds carry no debug symbols. With symbols on, the compiler writes the full path
+       of the .pdb on the build machine into the assembly, and that path held a personal user
+       folder name. The Release DLL is the one that is published, so it must not carry that path.
+       Debug builds keep portable symbols so stack traces stay readable while developing. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Brings in the XrmToolBox extensibility assemblies, the Dataverse SDK, WebView2 and
+         Newtonsoft.Json. Every one of these already ships with XrmToolBox, so the tool package
+         must not redistribute them - see package/Oliver4.DataModelDesigner.nuspec. -->
+    <PackageReference Include="XrmToolBoxPackage" Version="1.2025.10.74" />
+
+    <!-- Works around a version skew inside XrmToolBoxPackage 1.2025.10.74: it declares a
+         dependency on MscrmTools.Xrm.Connection (>= 1.2025.7.63), but the
+         XrmToolBox.Extensibility.dll it actually ships was compiled against 1.2025.9.64.
+         NuGet resolves the declared minimum, and the compiler then rejects the older assembly
+         with CS1705 ("uses ... which has a higher version than referenced assembly").
+         Naming the package directly pins the version the extensibility assembly really needs.
+
+         If XrmToolBoxPackage is upgraded, check this version still matches - the symptom
+         of it being too low is CS1705 naming McTools.Xrm.Connection. -->
+    <PackageReference Include="MscrmTools.Xrm.Connection" Version="1.2025.9.64" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The whole web application is compiled into the assembly and served from memory by
+         ModelDesignerControl. Nothing is written to disk and nothing is fetched over the network,
+         which keeps the tool usable on locked-down builds. -->
+    <EmbeddedResource Include="Web\**\*.html" />
+    <EmbeddedResource Include="Web\**\*.css" />
+    <EmbeddedResource Include="Web\**\*.js" />
+    <EmbeddedResource Include="Web\**\*.png" />
+    <EmbeddedResource Include="Web\**\*.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Link="README.md" />
+    <None Include="..\..\LICENSE" Link="LICENSE" />
+  </ItemGroup>
+
+</Project>
